@@ -139,6 +139,24 @@ def parse_variant_output(text: str) -> dict:
     }
 
 
+def extract_ebay_values(options_text: str) -> str:
+    values = []
+    for line in (options_text or "").splitlines():
+        cleaned_line = re.sub(r"^\s*[-*•]\s*", "", line).strip()
+        if not cleaned_line or "=" not in cleaned_line:
+            continue
+        values.append(cleaned_line.split("=", 1)[1].strip())
+    return "\n".join(values)
+
+
+
+
+def format_ebay_options_for_output(options_text: str) -> str:
+    ebay_values = extract_ebay_values(options_text)
+    if not ebay_values:
+        return ""
+    return "\n".join(f"- {line}" for line in ebay_values.splitlines() if line.strip())
+
 def render_copy_button(label: str, text: str, key: str):
     button_id = f"copy-btn-{key}"
     payload = json.dumps(text or "")
@@ -220,7 +238,7 @@ with col1:
         image_bytes = uploaded_image.getvalue()
         image_hash = hashlib.sha256(image_bytes).hexdigest()
         st.session_state["image_hash"] = image_hash
-        st.image(uploaded_image, caption="Uploaded screenshot", use_container_width=True)
+        st.image(uploaded_image, caption="Uploaded screenshot", width=320)
 
     btn_generate = st.button("Generate", type="primary", use_container_width=True)
 
@@ -270,16 +288,22 @@ with col2:
     st.text_input("Attribut", key="out_attribute")
     st.text_area("Optionen", height=260, key="out_options")
 
+    ebay_values = extract_ebay_values(st.session_state.get("out_options", ""))
+    ebay_options_for_output = format_ebay_options_for_output(st.session_state.get("out_options", ""))
+
     combined_output = ""
-    if st.session_state.get("out_attribute") or st.session_state.get("out_options"):
+    if st.session_state.get("out_attribute") or ebay_options_for_output:
         combined_output = (
             f"Attribut:\n{st.session_state.get('out_attribute', '')}\n\n"
-            f"Optionen:\n{st.session_state.get('out_options', '')}"
+            f"Optionen:\n{ebay_options_for_output}"
         )
 
-    col_copy1, col_copy2 = st.columns(2)
+    col_copy1, col_copy2, col_copy3 = st.columns(3)
     with col_copy1:
         render_copy_button("Copy Attribute", st.session_state.get("out_attribute", ""), "copy_attr")
     with col_copy2:
         render_copy_button("Copy Full Output", combined_output, "copy_full")
-
+        st.caption("Copies only eBay-ready attribute + options (without control part).")
+    with col_copy3:
+        render_copy_button("Copy eBay Options", ebay_values, "copy_ebay_options")
+        st.caption("Copies only values after '=' (without control part).")
