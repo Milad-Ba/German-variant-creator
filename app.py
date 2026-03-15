@@ -323,17 +323,13 @@ with col2:
 
     combined_output = ""
     if st.session_state.get("out_attribute") or ebay_options_for_output:
-        combined_output = (
-            f"Attribut:\n{st.session_state.get('out_attribute', '')}\n\n"
-            f"Optionen:\n{ebay_options_for_output}"
-        )
+        output_parts = [part for part in [st.session_state.get("out_attribute", ""), ebay_options_for_output] if part]
+        combined_output = "\n".join(output_parts)
 
     col_copy1, col_copy2, col_copy3 = st.columns(3)
     with col_copy1:
         render_copy_button("Copy Attribute", st.session_state.get("out_attribute", ""), "copy_attr")
     with col_copy2:
         render_copy_button("Copy Full Output", combined_output, "copy_full")
-        st.caption("Copies only eBay-ready attribute + options (without control part).")
     with col_copy3:
         render_copy_button("Copy eBay Options", ebay_values, "copy_ebay_options")
-        st.caption("Copies only values after '=' (without control part).")
