@@ -49,6 +49,27 @@ OPENROUTER_MODEL_VISION = safe_secret("OPENROUTER_MODEL_VISION", "google/gemini-
 TEMPERATURE = 0
 TIMEOUT_SEC = 90
 
+APP_PASSWORD = "3331"
+
+
+def require_app_password() -> bool:
+    if st.session_state.get("authenticated", False):
+        return True
+
+    st.title("Variant Tool (DE)")
+    st.subheader("Login")
+    entered_password = st.text_input("App password", type="password", key="app_password_input")
+
+    if st.button("Unlock", type="primary", use_container_width=True):
+        if entered_password == APP_PASSWORD:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Wrong password.")
+
+    return False
+
+
 SYSTEM_PROMPT = """
 I will upload a product title and a supplier variant screenshot.
 
@@ -214,6 +235,9 @@ def render_copy_button(label: str, text: str, key: str):
         """
     st.components.v1.html(html_content, height=42)
 
+
+if not require_app_password():
+    st.stop()
 
 st.title("Variant Tool (DE)")
 
