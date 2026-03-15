@@ -307,10 +307,10 @@ with col2:
         for idx, option_row in enumerate(option_rows):
             control_col, ebay_col = st.columns([2, 3], gap="large")
             with control_col:
-                st.caption("Nur Kontrolle")
+                st.caption("For reference only")
                 st.caption(option_row.get("control", ""))
             with ebay_col:
-                st.caption("Für eBay kopieren")
+                st.caption("Copy for eBay")
                 st.markdown(f"**{option_row.get('ebay', '')}**")
 
             if idx < len(option_rows) - 1:
