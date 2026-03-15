@@ -1,4 +1,5 @@
 import base64
+import html
 import hashlib
 import json
 import re
@@ -21,6 +22,11 @@ div.stButton > button[kind="primary"]{
 div.stButton > button[kind="primary"]:hover{
   background:#dc2626 !important;
   border-color:#dc2626 !important;
+}
+.control-text {
+  user-select: none;
+  -webkit-user-select: none;
+  color: #6b7280;
 }
 </style>
 """,
