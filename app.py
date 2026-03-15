@@ -1,4 +1,5 @@
 import base64
+import html
 import hashlib
 import json
 import re
@@ -21,6 +22,11 @@ div.stButton > button[kind="primary"]{
 div.stButton > button[kind="primary"]:hover{
   background:#dc2626 !important;
   border-color:#dc2626 !important;
+}
+.control-text {
+  user-select: none;
+  -webkit-user-select: none;
+  color: #6b7280;
 }
 </style>
 """,
@@ -267,9 +273,6 @@ with col1:
 with col2:
     st.subheader("Output")
 
-    st.text_input("Attribut", key="out_attribute")
-    st.text_area("Optionen", height=260, key="out_options")
-
     combined_output = ""
     if st.session_state.get("out_attribute") or st.session_state.get("out_options"):
         combined_output = (
@@ -277,9 +280,29 @@ with col2:
             f"Optionen:\n{st.session_state.get('out_options', '')}"
         )
 
-    col_copy1, col_copy2 = st.columns(2)
-    with col_copy1:
-        render_copy_button("Copy Attribute", st.session_state.get("out_attribute", ""), "copy_attr")
-    with col_copy2:
-        render_copy_button("Copy Full Output", combined_output, "copy_full")
+    col_control, col_ebay = st.columns(2)
 
+    with col_control:
+        st.markdown("**Kontrolle (nicht kopieren)**")
+        st.caption("Linke Seite nur Kontrolle (nicht für eBay)")
+
+        control_output = combined_output or "Attribut:\n\nOptionen:\n"
+        control_html = (
+            '<div style="padding:0.35rem 0;"><span class="control-text">'
+            + html.escape(control_output).replace("\n", "<br>")
+            + "</span></div>"
+        )
+        st.markdown(control_html, unsafe_allow_html=True)
+
+    with col_ebay:
+        st.markdown("**eBay-Ausgabe (kopierbar)**")
+        st.caption("Rechte Seite für eBay, inkl. Copy-Button.")
+
+        st.text_input("Attribut", key="out_attribute")
+        st.text_area("Optionen", height=260, key="out_options")
+
+        col_copy1, col_copy2 = st.columns(2)
+        with col_copy1:
+            render_copy_button("Copy Attribute", st.session_state.get("out_attribute", ""), "copy_attr")
+        with col_copy2:
+            render_copy_button("Copy Full Output", combined_output, "copy_full")
