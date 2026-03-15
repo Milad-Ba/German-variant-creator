@@ -79,7 +79,6 @@ def clear_all():
         "product_title",
         "out_attribute",
         "out_options",
-        "raw_output",
         "image_hash",
     ]
     for key in keys_to_clear:
@@ -260,7 +259,7 @@ with col1:
                     raw_output = call_openrouter(messages)
                     parsed = parse_variant_output(raw_output)
 
-                st.session_state["raw_output"] = parsed["raw"]
+               
                 st.session_state["out_attribute"] = parsed["attribute"]
                 st.session_state["out_options"] = "\n".join(f"- {opt}" for opt in parsed["options"])
                 st.rerun()
@@ -284,6 +283,3 @@ with col2:
     with col_copy2:
         render_copy_button("Copy Full Output", combined_output, "copy_full")
 
-    st.divider()
-    st.caption("Model output:")
-    st.text_area("Raw output", value=st.session_state.get("raw_output", ""), height=180)
