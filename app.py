@@ -224,9 +224,8 @@ with col1:
 
     st.button("Clear", use_container_width=True, on_click=clear_all)
 
-    st.text_area(
+    st.text_input(
         "Product title",
-        height=130,
         key="product_title",
         placeholder="Paste product title here...",
     )
@@ -317,27 +316,20 @@ with col2:
             if idx < len(option_rows) - 1:
                 st.divider()
     elif st.session_state.get("out_options"):
-        st.info("Keine strukturierten Optionen gefunden. Bitte Debug/Raw prüfen.")
-
-    with st.expander("Debug/Raw Optionen", expanded=False):
-        st.text_area("Optionen (raw)", height=220, key="out_options")
+        st.info("Keine strukturierten Optionen gefunden.")
 
     ebay_values = extract_ebay_values(st.session_state.get("out_options", ""))
     ebay_options_for_output = format_ebay_options_for_output(st.session_state.get("out_options", ""))
 
     combined_output = ""
     if st.session_state.get("out_attribute") or ebay_options_for_output:
-        combined_output = (
-            f"Attribut:\n{st.session_state.get('out_attribute', '')}\n\n"
-            f"Optionen:\n{ebay_options_for_output}"
-        )
+        output_parts = [part for part in [st.session_state.get("out_attribute", ""), ebay_options_for_output] if part]
+        combined_output = "\n".join(output_parts)
 
     col_copy1, col_copy2, col_copy3 = st.columns(3)
     with col_copy1:
         render_copy_button("Copy Attribute", st.session_state.get("out_attribute", ""), "copy_attr")
     with col_copy2:
         render_copy_button("Copy Full Output", combined_output, "copy_full")
-        st.caption("Copies only eBay-ready attribute + options (without control part).")
     with col_copy3:
         render_copy_button("Copy eBay Options", ebay_values, "copy_ebay_options")
-        st.caption("Copies only values after '=' (without control part).")
