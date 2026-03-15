@@ -37,7 +37,8 @@ def safe_secret(key: str, default: str = "") -> str:
 
 OPENROUTER_API_KEY = safe_secret("OPENROUTER_API_KEY", "").strip()
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = "google/gemini-2.5-flash-preview"
+# Models wie im bisherigen Tool
+OPENROUTER_MODEL_VISION = safe_secret("OPENROUTER_MODEL_VISION", "google/gemini-3-flash-preview").strip()
 
 TEMPERATURE = 0
 TIMEOUT_SEC = 90
@@ -94,7 +95,7 @@ def call_openrouter(messages: list[dict]) -> str:
         raise RuntimeError("Missing OPENROUTER_API_KEY in Streamlit secrets.")
 
     payload = {
-        "model": OPENROUTER_MODEL,
+        "model": OPENROUTER_MODEL_VISION,
         "messages": messages,
         "temperature": TEMPERATURE,
     }
