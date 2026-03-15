@@ -139,6 +139,16 @@ def parse_variant_output(text: str) -> dict:
     }
 
 
+def extract_ebay_values(options_text: str) -> str:
+    values = []
+    for line in (options_text or "").splitlines():
+        cleaned_line = re.sub(r"^\s*[-*•]\s*", "", line).strip()
+        if not cleaned_line or "=" not in cleaned_line:
+            continue
+        values.append(cleaned_line.split("=", 1)[1].strip())
+    return "\n".join(values)
+
+
 def render_copy_button(label: str, text: str, key: str):
     button_id = f"copy-btn-{key}"
     payload = json.dumps(text or "")
@@ -277,9 +287,13 @@ with col2:
             f"Optionen:\n{st.session_state.get('out_options', '')}"
         )
 
-    col_copy1, col_copy2 = st.columns(2)
+    ebay_values = extract_ebay_values(st.session_state.get("out_options", ""))
+
+    col_copy1, col_copy2, col_copy3 = st.columns(3)
     with col_copy1:
         render_copy_button("Copy Attribute", st.session_state.get("out_attribute", ""), "copy_attr")
     with col_copy2:
         render_copy_button("Copy Full Output", combined_output, "copy_full")
-
+    with col_copy3:
+        render_copy_button("Copy eBay Options", ebay_values, "copy_ebay_options")
+        st.caption("Kopiert nur die Werte nach '=' (ohne Kontrollteil).")
