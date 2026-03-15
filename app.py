@@ -37,7 +37,7 @@ def safe_secret(key: str, default: str = "") -> str:
 
 OPENROUTER_API_KEY = safe_secret("OPENROUTER_API_KEY", "").strip()
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-OPENROUTER_MODEL = safe_secret("OPENROUTER_MODEL", "google/gemini-2.5-flash-preview").strip()
+OPENROUTER_MODEL = "google/gemini-2.5-flash-preview"
 
 TEMPERATURE = 0
 TIMEOUT_SEC = 90
