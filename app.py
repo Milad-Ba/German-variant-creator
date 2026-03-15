@@ -224,9 +224,8 @@ with col1:
 
     st.button("Clear", use_container_width=True, on_click=clear_all)
 
-    st.text_area(
+    st.text_input(
         "Product title",
-        height=130,
         key="product_title",
         placeholder="Paste product title here...",
     )
@@ -317,10 +316,7 @@ with col2:
             if idx < len(option_rows) - 1:
                 st.divider()
     elif st.session_state.get("out_options"):
-        st.info("Keine strukturierten Optionen gefunden. Bitte Debug/Raw prüfen.")
-
-    with st.expander("Debug/Raw Optionen", expanded=False):
-        st.text_area("Optionen (raw)", height=220, key="out_options")
+        st.info("Keine strukturierten Optionen gefunden.")
 
     ebay_values = extract_ebay_values(st.session_state.get("out_options", ""))
     ebay_options_for_output = format_ebay_options_for_output(st.session_state.get("out_options", ""))
