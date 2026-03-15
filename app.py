@@ -79,10 +79,11 @@ def clear_all():
         "product_title",
         "out_attribute",
         "out_options",
+        "out_options_rows",
         "image_hash",
     ]
     for key in keys_to_clear:
-        st.session_state[key] = ""
+        st.session_state[key] = [] if key == "out_options_rows" else ""
 
     current_uploader_key = st.session_state.get("uploader_key", 0)
     st.session_state.pop(f"variant_image_{current_uploader_key}", None)
@@ -259,16 +260,43 @@ with col1:
                     raw_output = call_openrouter(messages)
                     parsed = parse_variant_output(raw_output)
 
-               
+                options_rows = []
+                for option_line in parsed["options"]:
+                    if "=" in option_line:
+                        left_part, right_part = option_line.split("=", 1)
+                        options_rows.append({"control": left_part.strip(), "ebay": right_part.strip()})
+                    else:
+                        clean_line = option_line.strip()
+                        options_rows.append({"control": clean_line, "ebay": clean_line})
+
                 st.session_state["out_attribute"] = parsed["attribute"]
                 st.session_state["out_options"] = "\n".join(f"- {opt}" for opt in parsed["options"])
+                st.session_state["out_options_rows"] = options_rows
                 st.rerun()
 
 with col2:
     st.subheader("Output")
 
     st.text_input("Attribut", key="out_attribute")
-    st.text_area("Optionen", height=260, key="out_options")
+
+    option_rows = st.session_state.get("out_options_rows", [])
+    if option_rows:
+        for idx, option_row in enumerate(option_rows):
+            control_col, ebay_col = st.columns([2, 3], gap="large")
+            with control_col:
+                st.caption("Nur Kontrolle")
+                st.caption(option_row.get("control", ""))
+            with ebay_col:
+                st.caption("Für eBay kopieren")
+                st.markdown(f"**{option_row.get('ebay', '')}**")
+
+            if idx < len(option_rows) - 1:
+                st.divider()
+    elif st.session_state.get("out_options"):
+        st.info("Keine strukturierten Optionen gefunden. Bitte Debug/Raw prüfen.")
+
+    with st.expander("Debug/Raw Optionen", expanded=False):
+        st.text_area("Optionen (raw)", height=220, key="out_options")
 
     combined_output = ""
     if st.session_state.get("out_attribute") or st.session_state.get("out_options"):
@@ -282,4 +310,3 @@ with col2:
         render_copy_button("Copy Attribute", st.session_state.get("out_attribute", ""), "copy_attr")
     with col_copy2:
         render_copy_button("Copy Full Output", combined_output, "copy_full")
-
